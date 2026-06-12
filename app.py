@@ -1,19 +1,13 @@
 import streamlit as st
 import pandas as pd
-from streamlit_gsheets import GSheetsConnection
+import requests
+import json
+
+# URL DE TU APLICACIÓN WEB DE APPS SCRIPT
+URL_API = "https://script.google.com/macros/s/AKfycbz1z9TjPs05jsxksRAK_PsiwJyL-LoZ-y6oBhu_-8OCheEsqubNKpSD6MPhGYwk1cdz6w/exec"
 
 st.title("Sistema de Constancias - CETIS 20")
 
-# URL DE TU GOOGLE SHEETS (Pega aquí el enlace de tu hoja de cálculo)
-URL_HOJA = "https://docs.google.com/spreadsheets/d/TU_ENLACE_AQUI/edit?usp=sharing"
-
-# Establecer la conexión con Google Sheets
-try:
-    conn = st.connection("gsheets", type=GSheetsConnection)
-except Exception:
-    st.error("Error al conectar con la base de datos. Verifica la configuración de Streamlit Cloud.")
-
-# Listas oficiales del plantel
 LISTA_GRUPOS = [
     "6ACM", "6BCM", "6ACV", "6BCV", "6APABM", "6APABV", 
     "6BPABV", "6AMAM", "6AMAV", "6AEV", "6ALCM", "6BLCM", "6ALCV"
@@ -44,51 +38,46 @@ with tab1:
         
         if enviar:
             if nombre and matricula and institucion:
+                payload = {
+                    "nombre": nombre.upper().strip(),
+                    "matricula": matricula.strip(),
+                    "grupo": grupo,
+                    "especialidad": especialidad,
+                    "institucion": institucion.upper().strip()
+                }
                 try:
-                    # Leer los datos actuales de Google Sheets
-                    df_actual = conn.read(spreadsheet=URL_HOJA, ttl="0d")
-                    
-                    # Crear el nuevo registro
-                    nuevo_alumno = pd.DataFrame([[
-                        nombre.upper().strip(), 
-                        matricula.strip(), 
-                        grupo, 
-                        especialidad,
-                        institucion.upper().strip()
-                    ]], columns=["Nombre", "Matrícula", "Grupo", "Especialidad", "Institucion"])
-                    
-                    # Combinar y actualizar la nube
-                    df_final = pd.concat([df_actual, nuevo_alumno], ignore_index=True)
-                    conn.update(spreadsheet=URL_HOJA, data=df_final)
-                    
-                    st.success("¡Datos guardados correctamente en la nube! Ya puedes avisar a la maestra.")
+                    res = requests.post(URL_API, data=json.dumps(payload))
+                    if res.status_code == 200:
+                        st.success("¡Datos guardados correctamente en la nube! Ya puedes avisar a la maestra.")
+                    else:
+                        st.error("Error en el servidor de Google. Intenta más tarde.")
                 except Exception as e:
-                    st.error(f"Hubo un problema al guardar los datos: {e}")
+                    st.error(f"Hubo un problema al conectar con Google: {e}")
             else:
                 st.error("Por favor, llena todos los campos obligatorios.")
 
 # --- PESTAÑA 2: PANEL DE LA MAESTRA ---
 with tab2:
     st.header("Control de Constancias por Grupo")
-    
     password = st.text_input("Contraseña de Admin", type="password")
     
     if password == "cetis2026":
         try:
-            # Forzar lectura sin caché (ttl="0d") para ver registros nuevos al instante
-            df_maestra = conn.read(spreadsheet=URL_HOJA, ttl="0d")
+            # Consultar datos directo a Google Sheets
+            res = requests.get(URL_API)
+            datos_json = res.json()
             
-            # Verificar si la hoja tiene registros (omitir si está vacía la fila 2)
-            if df_maestra is not None and not df_maestra.empty and df_maestra.iloc[0].notna().any():
-                st.subheader("Filtros de búsqueda")
+            if len(datos_json) > 1:
+                # Convertir la respuesta de Google en un DataFrame limpio
+                df_maestra = pd.DataFrame(datos_json[1:], columns=datos_json[0])
                 
+                st.subheader("Filtros de búsqueda")
                 col1, col2 = st.columns(2)
                 with col1:
                     filtro_grupo = st.selectbox("Selecciona el Grupo", ["Todos"] + LISTA_GRUPOS)
                 with col2:
                     filtro_esp = st.selectbox("Selecciona la Especialidad", ["Todas"] + LISTA_ESPECIALIDADES)
                 
-                # Aplicar filtros
                 df_filtrado = df_maestra.copy()
                 if filtro_grupo != "Todos":
                     df_filtrado = df_filtrado[df_filtrado["Grupo"] == filtro_grupo]
@@ -98,7 +87,6 @@ with tab2:
                 st.write(f"Alumnos encontrados: {len(df_filtrado)}")
                 st.dataframe(df_filtrado)
                 
-                # Botón de descarga
                 csv_filtrado = df_filtrado.to_csv(index=False).encode('utf-8-sig')
                 nombre_archivo = f"Constancias_{filtro_grupo}.csv" if filtro_grupo != "Todos" else "Constancias_Filtradas.csv"
                 
