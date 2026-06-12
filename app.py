@@ -48,7 +48,7 @@ with tab1:
                 try:
                     res = requests.post(URL_API, data=json.dumps(payload))
                     if res.status_code == 200:
-                        st.success("¡Datos guardados correctamente en la nube! Ya puedes avisar a la maestra.")
+                        st.success("¡Registro exitoso! Tus datos han sido guardados correctamente en el sistema de Servicio Social.")
                     else:
                         st.error("Error en el servidor de Google. Intenta más tarde.")
                 except Exception as e:
