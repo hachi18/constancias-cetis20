@@ -1,5 +1,2 @@
-streamlit
-pandas
-st-files-connection
-st-theme
 streamlit-gsheets
+pandas
