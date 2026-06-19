@@ -21,7 +21,7 @@ LISTA_ESPECIALIDADES = [
     "TECNICO EN LABORATORISTA CLINICO"
 ]
 
-tab1, tab2 = st.tabs(["📝 Registro de Alumnos", "⚙️ Panel de Administración"])
+tab1, tab2 = st.tabs(["Registro de Alumnos", "Panel de Administración"])
 
 # --- PESTAÑA 1: REGISTRO DE ALUMNOS ---
 with tab1:
