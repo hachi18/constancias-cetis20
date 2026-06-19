@@ -6,7 +6,7 @@ import json
 # URL DE TU APLICACIÓN WEB DE APPS SCRIPT
 URL_API = "https://script.google.com/macros/s/AKfycbz1z9TjPs05jsxksRAK_PsiwJyL-LoZ-y6oBhu_-8OCheEsqubNKpSD6MPhGYwk1cdz6w/exec"
 
-st.title("Sistema de Constancias - CETIS 20")
+st.title("Registro de Servicio Social - CETIS 20")
 
 LISTA_GRUPOS = [
     "6ACM", "6BCM", "6ACV", "6BCV", "6APABM", "6APABV", 
