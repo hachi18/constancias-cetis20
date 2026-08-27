@@ -25,7 +25,7 @@ tab1, tab2 = st.tabs(["Registro de Alumnos", "Panel de Administración"])
 
 # --- PESTAÑA 1: REGISTRO DE ALUMNOS ---
 with tab1:
-    st.header("Ingresa tus datos para la constancia")
+    st.header("Ingresa tus datos para la carta de presentación y constancia")
     
     with st.form("form_alumno", clear_on_submit=True):
         nombre = st.text_input("Nombre Completo (Empezando por Apellido Paterno y en MAYÚSCULAS)")
