@@ -33,7 +33,7 @@ with tab1:
         grupo = st.selectbox("Grupo", LISTA_GRUPOS)
         especialidad = st.selectbox("Especialidad", LISTA_ESPECIALIDADES)
         institucion = st.text_input("Nombre Completo de la Institución o Empresa donde se realizará el Servicio Social")
-        responsable = st.text_input("Nombre Completo del Responsable de Servicio Social (de la institución o empresa)")
+        responsable = st.text_input("Nombre Completo del Responsable del Servicio Social (de la institución o empresa)")
         cargo = st.text_input("Cargo o Puesto del Responsable de Servicio Social (ej. Director, Jefe de RH, Administrador)")
         
         enviar = st.form_submit_button("Registrar Datos")
