@@ -32,18 +32,22 @@ with tab1:
         matricula = st.text_input("Número de Control / Matrícula")
         grupo = st.selectbox("Grupo", LISTA_GRUPOS)
         especialidad = st.selectbox("Especialidad", LISTA_ESPECIALIDADES)
-        institucion = st.text_input("Institución o Dependencia (Donde realizas tu Servicio Social)")
+        institucion = st.text_input("Nombre Completo de la Institución o Empresa")
+        responsable = st.text_input("Nombre Completo del Responsable de Servicio Social")
+        cargo = st.text_input("Cargo o Puesto del Responsable (ej. Director, Jefe de RH, Administrador)")
         
         enviar = st.form_submit_button("Registrar Datos")
         
         if enviar:
-            if nombre and matricula and institucion:
+            if nombre and matricula and institucion and responsable and cargo:
                 payload = {
                     "nombre": nombre.upper().strip(),
                     "matricula": matricula.strip(),
                     "grupo": grupo,
                     "especialidad": especialidad,
-                    "institucion": institucion.upper().strip()
+                    "institucion": institucion.upper().strip(),
+                    "responsable": responsable.upper().strip(),
+                    "cargo": cargo.upper().strip()
                 }
                 try:
                     res = requests.post(URL_API, data=json.dumps(payload))
@@ -56,7 +60,7 @@ with tab1:
             else:
                 st.error("Por favor, llena todos los campos obligatorios.")
 
-# --- PESTAÑA 2: PANEL DE LA MAESTRA ---
+# PESTAÑA 2: PANEL DE LA MAESTRA 
 with tab2:
     st.header("Control de Constancias por Grupo")
     password = st.text_input("Contraseña de Admin", type="password")
